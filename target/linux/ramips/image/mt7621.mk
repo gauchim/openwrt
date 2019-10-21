@@ -47,6 +47,11 @@ define Build/iodata-factory
 	fi
 endef
 
+define Build/ubootpad96
+	uimage_padhdr -i $@ -o $@.new -l 96
+	mv $@.new $@
+endef
+
 define Build/ubnt-erx-factory-image
 	if [ -e $(KDIR)/tmp/$(KERNEL_INITRAMFS_IMAGE) -a "$$(stat -c%s $@)" -lt "$(KERNEL_SIZE)" ]; then \
 		echo '21001:6' > $(1).compat; \
@@ -176,6 +181,28 @@ define Device/dlink_dir-860l-b1
   SUPPORTED_DEVICES += dir-860l-b1
 endef
 TARGET_DEVICES += dlink_dir-860l-b1
+
+define Device/dlink_dir-878-a1
+  $(Device/ubootpad96)
+  MTK_SOC := mt7621
+  BLOCKSIZE := 64k
+  IMAGE_SIZE := 15936k
+  DEVICE_VENDOR := D-Link
+  IMAGES += factory.bin
+  DEVICE_MODEL := DIR-878
+  DEVICE_VARIANT := A1
+  DEVICE_PACKAGES := \
+	kmod-mt7615e kmod-usb3 kmod-usb-ledtrig-usbport wpad-basic \
+	uboot-envtools
+  KERNEL_INITRAMFS := $$(KERNEL) | ubootpad96
+  IMAGE/sysupgrade.bin := append-kernel | append-rootfs |\
+			ubootpad96 |\
+			pad-rootfs | append-metadata | check-size $$$$(IMAGE_SIZE)
+  IMAGE/factory.bin := append-kernel | append-rootfs |\
+			ubootpad96 | check-size $$$$(IMAGE_SIZE)
+  SUPPORTED_DEVICES += dir-878-a1
+endef
+TARGET_DEVICES += dlink_dir-878-a1
 
 define Device/d-team_newifi-d2
   MTK_SOC := mt7621

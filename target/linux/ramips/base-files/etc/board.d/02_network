@@ -309,6 +309,7 @@ ramips_setup_interfaces()
 			"0:lan" "6@eth0"
 		;;
 	dlink,dir-615-h1|\
+	dlink,dir-878-a1|\
 	d-team,newifi-d2|\
 	wevo,11acnas|\
 	wevo,w2914ns-v2|\
